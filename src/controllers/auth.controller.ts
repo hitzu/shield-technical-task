@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
 import { userCommands } from '../orm/commands/user';
 import { GeneralError } from '../classes/general-error';
+import { ConflictError, UnauthorizedError } from '../classes/http-errors';
 import { generate } from '../services/token';
 import { User } from '../orm/entities/User';
 
@@ -14,7 +15,7 @@ export const signIn = async (
     const { email, password } = req.body;
     const user = await userCommands.getUserByEmail(email);
     if (!user || !user.checkIfPasswordMatch(password)) {
-      throw new GeneralError(new Error('Unauthorized'), 'Unauthorized', 401);
+      throw new UnauthorizedError('Invalid credentials');
     }
     const token = await generate(user.id, user.email, 'active');
     res.status(200).json({ token });
@@ -37,7 +38,7 @@ export const signUp = async (
 
     const existingUser = await userCommands.getUserByEmail(email);
     if (existingUser) {
-      throw new GeneralError(new Error('User already exists'), 'Conflict', 409);
+      throw new ConflictError('User already exists');
     }
 
     const userRepository = getRepository(User);

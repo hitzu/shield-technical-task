@@ -149,3 +149,42 @@ npm run db:stop
 
 - The server reads `PORT` (default `8080`).
 - TypeORM uses `PG_HOST`, `PG_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` (by default pointing to the Docker DB on `5542`).
+
+### Error responses
+
+Standardized error payloads are returned across the API. Each response includes a `requestId` to correlate with logs.
+
+- Conflict (example):
+
+```json
+{
+  "message": "User already exists",
+  "code": 409,
+  "requestId": "14acacfc-a741-42be-a0a6-37cf851d3d94",
+  "error": true
+}
+```
+
+- Unprocessable Entity (validation details with Joi):
+
+```json
+{
+  "message": "Unprocessable Entity",
+  "code": 422,
+  "requestId": "4fbb549b-9c00-4d2a-a942-fb91c1a9c8f9",
+  "details": [
+    {
+      "message": "\"password\" length must be at least 4 characters long",
+      "path": ["password"],
+      "type": "string.min",
+      "context": {
+        "limit": 4,
+        "value": "pas",
+        "label": "password",
+        "key": "password"
+      }
+    }
+  ],
+  "error": true
+}
+```

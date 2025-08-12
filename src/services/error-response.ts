@@ -1,6 +1,5 @@
 import { GeneralError } from '../classes/general-error';
 import { HTTP_CODES } from '../constants/http-codes';
-
 import { ValidationError } from './validation';
 
 /**
@@ -16,10 +15,17 @@ export const errorResponse = (error: any): GeneralError => {
 
   // Map validation errors to a 422
   if (error instanceof ValidationError) {
+    const details = error?.details?.map((d: any) => ({
+      message: d.message,
+      path: d.path,
+      type: d.type,
+      context: d.context
+    }));
     return new GeneralError(
       error,
       'Unprocessable Entity',
-      HTTP_CODES.UnprocessableEntity
+      HTTP_CODES.UnprocessableEntity,
+      details
     );
   }
 

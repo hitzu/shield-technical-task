@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import { Wallet } from '../entities/Wallet';
 import { GeneralError } from '../../classes/general-error';
+import { NotFoundError, BadRequestError } from '../../classes/http-errors';
 
 export class walletCommands {
   static async findAllByUser(userId: number): Promise<Wallet[]> {
@@ -8,7 +9,7 @@ export class walletCommands {
       const repo = getRepository(Wallet);
       return await repo.find({ where: { userId } });
     } catch (error) {
-      throw new GeneralError(error, 'Unable to fetch wallets', 400);
+      throw new BadRequestError('Unable to fetch wallets');
     }
   }
 
@@ -16,12 +17,11 @@ export class walletCommands {
     try {
       const repo = getRepository(Wallet);
       const wallet = await repo.findOne({ where: { id, userId } });
-      if (!wallet)
-        throw new GeneralError(new Error('Not found'), 'Not found', 404);
+      if (!wallet) throw new NotFoundError('Wallet not found');
       return wallet;
     } catch (error) {
       if (error instanceof GeneralError) throw error;
-      throw new GeneralError(error, 'Unable to fetch wallet', 400);
+      throw new BadRequestError('Unable to fetch wallet');
     }
   }
 
@@ -34,7 +34,7 @@ export class walletCommands {
       const entity = repo.create({ ...data, userId });
       return await repo.save(entity);
     } catch (error) {
-      throw new GeneralError(error, 'Unable to create wallet', 400);
+      throw new BadRequestError('Unable to create wallet');
     }
   }
 
@@ -50,7 +50,7 @@ export class walletCommands {
       return await repo.save(wallet);
     } catch (error) {
       if (error instanceof GeneralError) throw error;
-      throw new GeneralError(error, 'Unable to update wallet', 400);
+      throw new BadRequestError('Unable to update wallet');
     }
   }
 
@@ -63,7 +63,7 @@ export class walletCommands {
       await repo.softDelete({ id, userId });
     } catch (error) {
       if (error instanceof GeneralError) throw error;
-      throw new GeneralError(error, 'Unable to delete wallet', 400);
+      throw new BadRequestError('Unable to delete wallet');
     }
   }
 }

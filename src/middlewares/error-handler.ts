@@ -14,7 +14,7 @@ export const errorHandler: ErrorRequestHandler = async (
     const requestId = (req as any).id || req.headers['x-request-id'];
     logger.error({ err: error, requestId }, 'request failed');
     const err: GeneralError = errorResponse(error);
-    const response = err.buildResponse();
+    const response = err.buildResponse(String(requestId || ''));
 
     res.setHeader('x-request-id', String(requestId || ''));
     res.status(err.code).json(response);
