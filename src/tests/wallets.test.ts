@@ -1,20 +1,21 @@
 import supertest from 'supertest';
-import { Connection, getRepository, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { dbCreateConnection } from '../orm/dbCreateConnection';
 import { User } from '../orm/entities/User';
 import { Wallet } from '../orm/entities/Wallet';
+import { AppDataSource } from '../orm/data-source';
 
 describe('wallets module', () => {
-  let dbConnection: Connection;
+  let dbConnection: DataSource;
   let userRepository: Repository<User>;
   let walletRepository: Repository<Wallet>;
   let user: User;
   let token: string;
 
   beforeAll(async () => {
-    dbConnection = (await dbCreateConnection()) as Connection;
-    userRepository = getRepository(User);
-    walletRepository = getRepository(Wallet);
+    dbConnection = (await dbCreateConnection()) as DataSource;
+    userRepository = AppDataSource.getRepository(User);
+    walletRepository = AppDataSource.getRepository(Wallet);
     // Reuse seeded user
     const existing = await userRepository.findOne({
       where: { email: 'wallet@test.com' }
@@ -49,9 +50,8 @@ describe('wallets module', () => {
       .execute();
     // Keep seeded user; just cleanup wallets
     // await userRepository.delete(user.id);
-    if (dbConnection && dbConnection.isConnected) {
-      await dbConnection.close();
-    }
+    if (dbConnection && dbConnection.isInitialized)
+      await dbConnection.destroy();
   });
 
   test('CRUD wallets', async () => {

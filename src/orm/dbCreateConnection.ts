@@ -1,29 +1,22 @@
-import { Connection, createConnection, getConnectionManager } from 'typeorm';
-
-import config from './config/ormconfig';
+import { DataSource } from 'typeorm';
 import { logger } from '../services/logger';
+import { AppDataSource } from './data-source';
 
-export const dbCreateConnection = async (): Promise<Connection | null> => {
+export const dbCreateConnection = async (): Promise<DataSource | null> => {
   try {
-    const conn = await createConnection(config);
-    logger.info(
-      { connection: conn.name, database: conn.options.database },
-      'database connected'
-    );
+    if (AppDataSource.isInitialized) return AppDataSource;
+    const ds = await AppDataSource.initialize();
+    logger.info({ database: ds.options.database }, 'database connected');
     try {
-      await conn.runMigrations();
+      await ds.runMigrations();
     } catch (migrationError) {
       logger.warn(
         { err: migrationError },
         'migration execution skipped or failed'
       );
     }
-    return conn;
+    return ds;
   } catch (err) {
-    if (err.name === 'AlreadyHasActiveConnectionError') {
-      const activeConnection = getConnectionManager().get(config.name);
-      return activeConnection;
-    }
     logger.error({ err }, 'database connection error');
   }
   return null;

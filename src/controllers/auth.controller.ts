@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { getRepository } from 'typeorm';
 import { userCommands } from '../orm/commands/user';
 import { GeneralError } from '../classes/general-error';
 import { ConflictError, UnauthorizedError } from '../classes/http-errors';
 import { decode, generate } from '../services/token';
 import { blacklistJti } from '../services/token-blacklist';
 import { User } from '../orm/entities/User';
+import { AppDataSource } from '../orm/data-source';
 
 export const signIn = async (
   req: Request,
@@ -60,7 +60,7 @@ export const signUp = async (
       throw new ConflictError('User already exists');
     }
 
-    const userRepository = getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
     const newUser = userRepository.create({ email, password, username, name });
     newUser.hashPassword();
     const savedUser = await userRepository.save(newUser);

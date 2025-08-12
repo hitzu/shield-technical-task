@@ -1,12 +1,12 @@
-import { getRepository } from 'typeorm';
 import { Wallet } from '../entities/Wallet';
 import { GeneralError } from '../../classes/general-error';
+import { AppDataSource } from '../data-source';
 import { NotFoundError, BadRequestError } from '../../classes/http-errors';
 
 export class walletCommands {
   static async findAllByUser(userId: number): Promise<Wallet[]> {
     try {
-      const repo = getRepository(Wallet);
+      const repo = AppDataSource.getRepository(Wallet);
       return await repo.find({ where: { userId } });
     } catch (error) {
       throw new BadRequestError('Unable to fetch wallets');
@@ -15,7 +15,7 @@ export class walletCommands {
 
   static async findByIdForUser(id: number, userId: number): Promise<Wallet> {
     try {
-      const repo = getRepository(Wallet);
+      const repo = AppDataSource.getRepository(Wallet);
       const wallet = await repo.findOne({ where: { id, userId } });
       if (!wallet) throw new NotFoundError('Wallet not found');
       return wallet;
@@ -30,7 +30,7 @@ export class walletCommands {
     data: Pick<Wallet, 'tag' | 'chain' | 'address'>
   ): Promise<Wallet> {
     try {
-      const repo = getRepository(Wallet);
+      const repo = AppDataSource.getRepository(Wallet);
       const entity = repo.create({ ...data, userId });
       return await repo.save(entity);
     } catch (error) {
@@ -44,7 +44,7 @@ export class walletCommands {
     data: Partial<Pick<Wallet, 'tag' | 'chain' | 'address'>>
   ): Promise<Wallet> {
     try {
-      const repo = getRepository(Wallet);
+      const repo = AppDataSource.getRepository(Wallet);
       const wallet = await this.findByIdForUser(id, userId);
       Object.assign(wallet, data);
       return await repo.save(wallet);
@@ -56,7 +56,7 @@ export class walletCommands {
 
   static async deleteForUser(id: number, userId: number): Promise<void> {
     try {
-      const repo = getRepository(Wallet);
+      const repo = AppDataSource.getRepository(Wallet);
       // Ensure the wallet exists and belongs to user
       await this.findByIdForUser(id, userId);
       // Soft delete to set deleted_at instead of hard delete

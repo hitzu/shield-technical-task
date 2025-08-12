@@ -1,9 +1,9 @@
-import { ConnectionOptions } from 'typeorm';
+import 'reflect-metadata';
+import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
-const config: ConnectionOptions = {
+export const AppDataSource = new DataSource({
   type: 'postgres',
-  name: 'default',
   host: process.env.PG_HOST || 'localhost',
   port: Number(process.env.PG_PORT || '5542'),
   username: process.env.POSTGRES_USER || 'postgres',
@@ -13,13 +13,7 @@ const config: ConnectionOptions = {
   logging: false,
   entities: ['src/orm/entities/**/*.ts'],
   migrations: ['src/orm/migrations/**/*.ts'],
-  subscribers: ['src/orm/subscriber/**/*.ts'],
-  cli: {
-    entitiesDir: 'src/orm/entities',
-    migrationsDir: 'src/orm/migrations',
-    subscribersDir: 'src/orm/subscriber'
-  },
-  namingStrategy: new SnakeNamingStrategy()
-};
+  namingStrategy: new SnakeNamingStrategy(),
+});
 
-export = config;
+export default AppDataSource;
