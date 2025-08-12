@@ -12,12 +12,17 @@ import compression from 'compression';
 import pinoHttp from 'pino-http';
 import { randomUUID } from 'crypto';
 import { logger } from './src/services/logger';
+import { rateLimitGlobal } from './src/middlewares/rate-limit';
 
 const app = Express();
 app.disable('x-powered-by');
 app.use(helmet());
 app.use(hpp());
 app.use(compression());
+// Trust proxy for correct IP extraction behind LB/CDN
+app.set('trust proxy', true);
+// Global rate limiting (disabled in tests inside middleware)
+app.use(rateLimitGlobal());
 app.use(
   pinoHttp({
     logger,

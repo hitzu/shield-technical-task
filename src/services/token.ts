@@ -9,6 +9,8 @@ export interface TokenData {
   user_id: string;
   username: string;
   status: boolean;
+  jti?: string;
+  exp?: number;
 }
 
 const lowerCaseObjectKeys = (obj: any): AnyObject => {
@@ -28,10 +30,12 @@ export const generate = (
   username: string,
   status: string
 ): string => {
+  const jti = require('crypto').randomUUID();
   const data = {
     user_id: user_id as number,
     username: username as string,
-    status: status as string
+    status: status as string,
+    jti
   };
   const encryptedData = CryptoJS.AES.encrypt(
     JSON.stringify(data),
@@ -39,7 +43,7 @@ export const generate = (
   );
 
   return JWT.sign(
-    { encrypted: encryptedData.toString() },
+    { encrypted: encryptedData.toString(), jti },
     process.env.TOKEN_SECRET_KEY,
     { expiresIn: process.env.JWT_EXPIRATION }
   );
@@ -61,7 +65,8 @@ export const verify = (token: string): Promise<TokenData> => {
       const tokenData: TokenData = JSON.parse(
         bytes.toString(CryptoJS.enc.Utf8)
       );
-
+      tokenData.jti = tokenEncryptedData.jti;
+      tokenData.exp = tokenEncryptedData.exp;
       resolve(tokenData);
     } catch (error) {
       reject(error);

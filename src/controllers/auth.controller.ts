@@ -3,7 +3,8 @@ import { getRepository } from 'typeorm';
 import { userCommands } from '../orm/commands/user';
 import { GeneralError } from '../classes/general-error';
 import { ConflictError, UnauthorizedError } from '../classes/http-errors';
-import { generate } from '../services/token';
+import { decode, generate } from '../services/token';
+import { blacklistJti } from '../services/token-blacklist';
 import { User } from '../orm/entities/User';
 
 export const signIn = async (
@@ -24,8 +25,26 @@ export const signIn = async (
   }
 };
 
-export const signOut = async (_req: Request, res: Response) => {
-  res.status(200).json({ success: true });
+export const signOut = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const header = (req.headers.authorization || '').toString();
+    const token = header.toLowerCase().startsWith('bearer ')
+      ? header.split(' ')[1]
+      : header;
+    const payload: any = await decode(token);
+    if (payload?.jti && payload?.exp) {
+      const now = Math.floor(Date.now() / 1000);
+      const ttl = Math.max(1, payload.exp - now);
+      await blacklistJti(payload.jti, ttl);
+    }
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const signUp = async (
@@ -52,7 +71,8 @@ export const signUp = async (
       username: savedUser.username,
       name: savedUser.name,
       created_at: savedUser.created_at,
-      updated_at: savedUser.updated_at
+      updated_at: savedUser.updated_at,
+      token: generate(savedUser.id, savedUser.email, 'active')
     });
   } catch (error) {
     next(error);

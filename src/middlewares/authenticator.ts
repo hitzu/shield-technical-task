@@ -2,6 +2,7 @@ import { decode } from '../services/token';
 import { NextFunction, RequestHandler } from 'express';
 import { RequestCustom } from '../interfaces/start-options.interface';
 import { GeneralError } from '../classes/general-error';
+import { isBlacklisted } from '../services/token-blacklist';
 
 const extractBearerToken = (authorizationHeader?: string): string => {
   if (!authorizationHeader) {
@@ -33,7 +34,15 @@ export const verifyToken = (): RequestHandler => {
   return async (req: RequestCustom, _, next: NextFunction) => {
     try {
       const token = extractBearerToken(req.headers.authorization as string);
-      req.token = await decode(token);
+      const payload = await decode(token);
+      if (payload?.jti && (await isBlacklisted(payload.jti))) {
+        throw new GeneralError(
+          new Error('Token blacklisted'),
+          'Unauthorized',
+          401
+        );
+      }
+      req.token = payload;
       next();
     } catch (error) {
       next(error);

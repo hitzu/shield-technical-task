@@ -14,3 +14,9 @@ services:
       timeout: 3s
       retries: 20
 
+  redis_test:
+    image: 'redis:7-alpine'
+    container_name: 'redis_shield_test'
+    ports:
+      - '6380:6379'
+

@@ -6,3 +6,8 @@ services:
     volumes:
       - ./database/shield:/var/lib/postgresql/data/
 
+  redis:
+    container_name: 'redis_shield'
+    ports:
+      - '6381:6379'
+

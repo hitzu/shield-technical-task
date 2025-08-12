@@ -21,6 +21,8 @@ Express.js + TypeScript + PostgreSQL backend to manage users and their wallets.
 - API: `http://localhost:8080` (Swagger at `http://localhost:8080/api-docs`)
 - PostgreSQL (development): host `localhost`, host port `5542` → container `5432`
 - PostgreSQL (tests): host `localhost`, host port `5543` → container `5432`
+- Redis (development): host `localhost`, host port `6381` → container `6379`
+- Redis (tests): host `localhost`, host port `6380` → container `6379`
 
 These mappings are defined in `docker-compose.override.yml` (dev) and `docker-compose.test.yml` (tests).
 
@@ -43,6 +45,9 @@ JWT_EXPIRATION=1h
 
 # Server
 PORT=8080
+
+# Redis
+REDIS_URL=redis://localhost:6381
 ```
 
 If you change credentials/port in Docker, mirror those changes here.

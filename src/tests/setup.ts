@@ -10,3 +10,4 @@ process.env.TOKEN_SECRET_KEY =
   process.env.TOKEN_SECRET_KEY || 'test_secret_key';
 process.env.JWT_EXPIRATION = process.env.JWT_EXPIRATION || '1h';
 process.env.NODE_ENV = 'test';
+process.env.REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6380';
