@@ -7,6 +7,15 @@ export const swDocument = {
     version: '1.0.0',
     description: 'REST API for Shield'
   },
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT'
+      }
+    }
+  },
   servers: [
     {
       url: 'http://localhost:8080/api',
@@ -17,13 +26,33 @@ export const swDocument = {
     '/auth/signin': { post: { summary: 'Sign in', tags: ['auth'] } },
     '/auth/signout': { post: { summary: 'Sign out', tags: ['auth'] } },
     '/wallets': {
-      get: { summary: 'List wallets', tags: ['wallets'] },
-      post: { summary: 'Create wallet', tags: ['wallets'] }
+      get: {
+        summary: 'List wallets',
+        tags: ['wallets'],
+        security: [{ bearerAuth: [] }]
+      },
+      post: {
+        summary: 'Create wallet',
+        tags: ['wallets'],
+        security: [{ bearerAuth: [] }]
+      }
     },
     '/wallets/{id}': {
-      get: { summary: 'Get wallet', tags: ['wallets'] },
-      put: { summary: 'Update wallet', tags: ['wallets'] },
-      delete: { summary: 'Delete wallet', tags: ['wallets'] }
+      get: {
+        summary: 'Get wallet',
+        tags: ['wallets'],
+        security: [{ bearerAuth: [] }]
+      },
+      put: {
+        summary: 'Update wallet',
+        tags: ['wallets'],
+        security: [{ bearerAuth: [] }]
+      },
+      delete: {
+        summary: 'Delete wallet',
+        tags: ['wallets'],
+        security: [{ bearerAuth: [] }]
+      }
     }
   }
 };

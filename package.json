@@ -26,7 +26,6 @@
     "migration:create": "NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:create -d ./src/orm/migrations",
     "migration:generate:dev": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:generate -d ./src/orm/migrations --config ./src/orm/config/ormconfig.ts",
     "seed:run:dev": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:run --config ./src/orm/config/ormconfig-seed.ts",
-    "install": "npm run db:start && npm run migration:run:dev && npm run seed:run:dev",
     "orm:typeorm:migration": "typeorm migration:create -n ./src/orm/migrations/Migration"
   },
   "license": "public",
@@ -37,6 +36,9 @@
     "crypto-js": "^4.0.0",
     "custom-env": "^2.0.1",
     "express": "^4.17.1",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
+    "compression": "^1.7.4",
     "ip": "^1.1.5",
     "joi": "^17.2.1",
     "joi-extract-type": "^15.0.8",

@@ -13,6 +13,7 @@ export const dbCreateConnection = async (): Promise<Connection | null> => {
     } catch (migrationError) {
       console.log('Migration execution skipped or failed:', migrationError);
     }
+    return conn;
   } catch (err) {
     if (err.name === 'AlreadyHasActiveConnectionError') {
       const activeConnection = getConnectionManager().get(config.name);
