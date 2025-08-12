@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { userCommands } from '../orm/commands/user';
-import { GeneralError } from '../classes/general-error';
+
 import { ConflictError, UnauthorizedError } from '../classes/http-errors';
+import { userCommands } from '../orm/commands/user';
+import { AppDataSource } from '../orm/data-source';
+import { User } from '../orm/entities/User';
 import { decode, generate } from '../services/token';
 import { blacklistJti } from '../services/token-blacklist';
-import { User } from '../orm/entities/User';
-import { AppDataSource } from '../orm/data-source';
 
 export const signIn = async (
   req: Request,

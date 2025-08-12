@@ -25,7 +25,9 @@
     "migration:create": "NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:create ./src/orm/migrations",
     "migration:generate:dev": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:generate ./src/orm/migrations --dataSource ./src/orm/data-source.ts",
     "seed:run:dev": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:run --dataSource ./src/orm/data-source.ts",
-    "orm:typeorm:migration": "typeorm migration:create -n ./src/orm/migrations/Migration"
+    "orm:typeorm:migration": "typeorm migration:create -n ./src/orm/migrations/Migration",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "license": "public",
   "dependencies": {
@@ -69,9 +71,16 @@
     "@types/morgan": "^1.9.0",
     "@types/node": "^14.18.36",
     "@types/supertest": "^2.0.11",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "aws-sdk": "^2.738.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-transform-typescript-metadata": "^0.3.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-import-resolver-typescript": "^3.10.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jest": "^27.9.0",
     "husky": "^4.2.5",
     "jest": "^27.0.6",
     "lint-staged": "^10.2.2",
@@ -82,7 +91,6 @@
     "ts-node": "^10.9.2",
     "ts-node-dev": "^1.0.0-pre.44",
     "tsconfig-paths": "^3.9.0",
-    "tslint": "^6.1.2",
     "ttypescript": "^1.5.10",
     "typescript": "^4.9.5",
     "typescript-transform-paths": "^1.1.14"
@@ -94,10 +102,10 @@
     }
   },
   "lint-staged": {
-    "*.{ts}": "tslint --fix",
+    "*.{ts}": "eslint --fix",
     "*.{ts,json,md}": "prettier --write"
   },
   "engines": {
-    "node": ">=22.14.0 <23"
+    "node": ">=22.14.0 <24"
   }
 }

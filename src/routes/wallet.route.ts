@@ -1,7 +1,5 @@
-import Express from 'express';
-import { verifyToken } from '../middlewares/authenticator';
-import { validateSchema } from '../middlewares/validate-input-schema';
-import { walletUpsertSchema } from '../schemas';
+import { Router } from 'express';
+
 import {
   listWallets,
   getWallet,
@@ -9,8 +7,11 @@ import {
   updateWallet,
   deleteWallet
 } from '../controllers/wallet.controller';
+import { verifyToken } from '../middlewares/authenticator';
+import { validateSchema } from '../middlewares/validate-input-schema';
+import { walletUpsertSchema } from '../schemas';
 
-const api = Express.Router();
+const api = Router();
 
 api.use(verifyToken());
 api.get('/wallets', listWallets);

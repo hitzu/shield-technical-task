@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { walletCommands } from '../orm/commands/wallet';
+import { Response, NextFunction } from 'express';
+
 import { RequestCustom } from '../interfaces/start-options.interface';
+import { walletCommands } from '../orm/commands/wallet';
 
 export const listWallets = async (
   req: RequestCustom,

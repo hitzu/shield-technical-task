@@ -1,6 +1,7 @@
-import { TypeCase } from '../interfaces/start-options.interface';
 import * as Cerealizr from 'cerealizr';
-import { NextFunction, Request, RequestHandler, Response, Send } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
+
+import { TypeCase } from '../interfaces/start-options.interface';
 
 const { CamelcaseSerializer, SnakecaseSerializer } = Cerealizr;
 

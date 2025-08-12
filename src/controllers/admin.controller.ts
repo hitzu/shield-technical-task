@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { getRedisClient } from '../services/redis';
+
 import { GeneralError } from '../classes/general-error';
+import { getRedisClient } from '../services/redis';
 
 export const resetRateLimit = async (
   req: Request,

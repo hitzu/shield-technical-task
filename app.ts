@@ -1,20 +1,22 @@
-import { corsHandler } from './src/middlewares/cors-handler';
-import { typeCase } from './src/middlewares/type-case';
-import Express from 'express';
-import authRouter from './src/routes/auth.route';
-import walletRouter from './src/routes/wallet.route';
-import { errorHandler } from './src/middlewares/error-handler';
-import swaggerUI from 'swagger-ui-express';
-import { swDocument } from './swagger.def';
+import { randomUUID } from 'crypto';
+
+import compression from 'compression';
+import express, { json, urlencoded } from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
-import compression from 'compression';
-import pinoHttp from 'pino-http';
-import { randomUUID } from 'crypto';
-import { logger } from './src/services/logger';
-import { rateLimitGlobal } from './src/middlewares/rate-limit';
+import pinoHttpMiddleware from 'pino-http';
+import swaggerUI from 'swagger-ui-express';
 
-const app = Express();
+import { corsHandler } from './src/middlewares/cors-handler';
+import { errorHandler } from './src/middlewares/error-handler';
+import { rateLimitGlobal } from './src/middlewares/rate-limit';
+import { typeCase } from './src/middlewares/type-case';
+import authRouter from './src/routes/auth.route';
+import walletRouter from './src/routes/wallet.route';
+import { logger } from './src/services/logger';
+import { swDocument } from './swagger.def';
+
+const app = express();
 app.disable('x-powered-by');
 app.use(helmet());
 app.use(hpp());
@@ -24,7 +26,7 @@ app.set('trust proxy', true);
 // Global rate limiting (disabled in tests inside middleware)
 app.use(rateLimitGlobal());
 app.use(
-  pinoHttp({
+  pinoHttpMiddleware({
     logger,
     genReqId: req => (req.headers['x-request-id'] as string) || randomUUID(),
     customProps: req => ({
@@ -50,8 +52,8 @@ app.use((req, res, next) => {
   res.setHeader('x-request-id', String(requestId));
   next();
 });
-app.use(Express.urlencoded({ extended: true }));
-app.use(Express.json({ limit: '50mb' }));
+app.use(urlencoded({ extended: true }));
+app.use(json({ limit: '50mb' }));
 app.use(corsHandler());
 app.use(typeCase('camel'));
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swDocument));
@@ -59,4 +61,4 @@ app.use('/api/auth', authRouter);
 app.use('/api', walletRouter);
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

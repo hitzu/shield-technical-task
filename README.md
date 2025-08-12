@@ -6,7 +6,7 @@ Express.js + TypeScript + PostgreSQL backend to manage users and their wallets.
 
 - Express.js
 - TypeScript
-- TypeORM (0.2.x)
+- TypeORM (0.3.x)
 - PostgreSQL
 - JWT (stateless auth)
 - Joi (validation)
@@ -55,11 +55,10 @@ If you change credentials/port in Docker, mirror those changes here.
 ### Quick install
 
 ```bash
-npm install
-npm run install   # starts DB (Docker), runs migrations and seeds for development
+npm run install
 ```
 
-Alternative (step by step):
+Step by step:
 
 ```bash
 npm run db:start            # start Postgres on 5542

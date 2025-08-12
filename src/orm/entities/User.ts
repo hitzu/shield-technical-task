@@ -1,4 +1,4 @@
-import argon2 from 'argon2';
+import { argon2id, hash, verify } from 'argon2';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -47,13 +47,13 @@ export class User {
   deleted_at: Date;
 
   async hashPassword(): Promise<void> {
-    this.password = await argon2.hash(this.password, { type: argon2.argon2id });
+    this.password = await hash(this.password, { type: argon2id });
   }
 
   async checkIfPasswordMatch(plain: string): Promise<boolean> {
     if (this.password.startsWith('$argon2')) {
-      return argon2.verify(this.password, plain);
+      return verify(this.password, plain);
     }
-    return argon2.verify(this.password, plain);
+    return verify(this.password, plain);
   }
 }

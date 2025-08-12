@@ -1,14 +1,15 @@
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+
 import { GeneralError } from '../classes/general-error';
 import { HTTP_CODES } from '../constants/http-codes';
 import { errorResponse } from '../services/error-response';
-import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { logger } from '../services/logger';
 
 export const errorHandler: ErrorRequestHandler = async (
   error: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   try {
     const requestId = (req as any).id || req.headers['x-request-id'];

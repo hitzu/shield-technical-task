@@ -8,6 +8,7 @@ import {
   Unique,
   DeleteDateColumn
 } from 'typeorm';
+
 import { User } from './User';
 
 @Entity('wallets')

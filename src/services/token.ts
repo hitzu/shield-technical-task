@@ -1,6 +1,7 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import CryptoJS from 'crypto-js';
 import { randomUUID } from 'crypto';
+
+import CryptoJS from 'crypto-js';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export interface TokenData {
   user_id: string;

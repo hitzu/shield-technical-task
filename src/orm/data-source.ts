@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   logging: false,
   entities: ['src/orm/entities/**/*.ts'],
   migrations: ['src/orm/migrations/**/*.ts'],
-  namingStrategy: new SnakeNamingStrategy(),
+  namingStrategy: new SnakeNamingStrategy()
 });
 
 export default AppDataSource;

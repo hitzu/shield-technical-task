@@ -1,7 +1,8 @@
-import { decode } from '../services/token';
 import { NextFunction, RequestHandler } from 'express';
-import { RequestCustom } from '../interfaces/start-options.interface';
+
 import { GeneralError } from '../classes/general-error';
+import { RequestCustom } from '../interfaces/start-options.interface';
+import { decode } from '../services/token';
 import { isBlacklisted } from '../services/token-blacklist';
 
 const extractBearerToken = (authorizationHeader?: string): string => {

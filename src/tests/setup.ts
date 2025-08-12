@@ -1,4 +1,5 @@
-require('custom-env').env('test');
+import customEnv from 'custom-env';
+customEnv.env('test');
 
 process.env.PG_HOST = process.env.PG_HOST || 'localhost';
 process.env.PG_PORT = process.env.PG_PORT || '5543';

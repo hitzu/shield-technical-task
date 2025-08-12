@@ -1,7 +1,7 @@
-import { Wallet } from '../entities/Wallet';
 import { GeneralError } from '../../classes/general-error';
-import { AppDataSource } from '../data-source';
 import { NotFoundError, BadRequestError } from '../../classes/http-errors';
+import { AppDataSource } from '../data-source';
+import { Wallet } from '../entities/Wallet';
 
 export class walletCommands {
   static async findAllByUser(userId: number): Promise<Wallet[]> {

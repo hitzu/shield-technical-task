@@ -1,4 +1,4 @@
-import Joi, { Schema } from 'joi';
+import Joi, { Schema, ValidationError } from 'joi';
 import 'joi-extract-type';
 
 interface AnyObject {
@@ -27,7 +27,5 @@ export const validate = (input: AnyObject, schema: Schema): Promise<any> => {
 
   return value;
 };
-
-const { ValidationError } = Joi;
 
 export { Joi, ValidationError };

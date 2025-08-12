@@ -1,9 +1,10 @@
 import supertest from 'supertest';
 import { DataSource, Repository } from 'typeorm';
+
+import { AppDataSource } from '../orm/data-source';
 import { dbCreateConnection } from '../orm/dbCreateConnection';
 import { User } from '../orm/entities/User';
 import { Wallet } from '../orm/entities/Wallet';
-import { AppDataSource } from '../orm/data-source';
 
 describe('wallets module', () => {
   let dbConnection: DataSource;
@@ -33,7 +34,7 @@ describe('wallets module', () => {
       user = existing;
     }
 
-    const app = require('../../app');
+    const { default: app } = await import('../../app');
     const res = await supertest(app)
       .post('/api/auth/signin')
       .send({ email: user.email, password: 'pass1' });
@@ -55,7 +56,7 @@ describe('wallets module', () => {
   });
 
   test('CRUD wallets', async () => {
-    const app = require('../../app');
+    const { default: app } = await import('../../app');
 
     const created = await supertest(app)
       .post('/api/wallets')

@@ -1,13 +1,14 @@
-import Express from 'express';
-import { signIn, signOut, signUp } from '../controllers/auth.controller';
+import { Router } from 'express';
+
 import { resetRateLimit } from '../controllers/admin.controller';
-import { validateSchema } from '../middlewares/validate-input-schema';
+import { signIn, signOut, signUp } from '../controllers/auth.controller';
 import { verifyToken } from '../middlewares/authenticator';
-import { signinSchema, signupSchema } from '../schemas';
 import { rateLimitSignin } from '../middlewares/rate-limit';
+import { validateSchema } from '../middlewares/validate-input-schema';
+import { signinSchema, signupSchema } from '../schemas';
 import { rateLimitResetSchema } from '../schemas/admin.schemas';
 
-const api = Express.Router();
+const api = Router();
 
 api.post(
   '/signin',

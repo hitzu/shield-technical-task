@@ -1,6 +1,6 @@
-import { User } from '../entities/User';
 import { GeneralError } from '../../classes/general-error';
 import { AppDataSource } from '../data-source';
+import { User } from '../entities/User';
 
 export class userCommands {
   static async getUserByEmail(email: string): Promise<User> {

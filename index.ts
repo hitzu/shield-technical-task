@@ -1,8 +1,9 @@
 'use strict';
-require('custom-env').env('development');
+import customEnv from 'custom-env';
+customEnv.env('development');
 import 'reflect-metadata';
+import app from './app';
 import { dbCreateConnection } from './src/orm/dbCreateConnection';
-const app = require('./app');
 import { logger } from './src/services/logger';
 
 const port = parseInt(process.env.PORT ?? '8080', 10);
