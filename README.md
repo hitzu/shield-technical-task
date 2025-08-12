@@ -155,6 +155,60 @@ npm run db:stop
 - The server reads `PORT` (default `8080`).
 - TypeORM uses `PG_HOST`, `PG_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` (by default pointing to the Docker DB on `5542`).
 
+### Rate limiting and JWT blacklist (Redis)
+
+This API supports rate limiting and JWT blacklisting using Redis.
+
+- Global rate limit (per IP):
+
+  - Controlled by env vars: `RATE_LIMIT_POINTS` (requests allowed) and `RATE_LIMIT_DURATION` (window seconds).
+  - Example: `RATE_LIMIT_POINTS=10`, `RATE_LIMIT_DURATION=60` → 10 requests per minute.
+
+- Sign-in brute-force protection:
+
+  - Per `ip+email`, with `SIGNIN_RATE_LIMIT_POINTS` and `SIGNIN_RATE_LIMIT_DURATION`.
+  - Example: `SIGNIN_RATE_LIMIT_POINTS=5`, `SIGNIN_RATE_LIMIT_DURATION=900` → 5 attempts per 15 minutes.
+
+- JWT blacklist on signout:
+
+  - Access tokens carry a `jti`.
+  - `POST /api/auth/signout` stores the `jti` in Redis with TTL until token expiration.
+  - Auth middleware denies blacklisted tokens (returns 401).
+
+- Redis configuration:
+  - Dev: service `redis` exposed on host `6381` → set `REDIS_URL=redis://localhost:6381`.
+  - Tests: service `redis_test` on host `6380` (tests auto-configured).
+  - If Redis is unavailable, rate limiters operate fail-open (requests are not blocked) and errors are logged.
+
+#### Quick testing with curl
+
+- Global limit 429 example (set `RATE_LIMIT_POINTS=10`):
+
+```bash
+for i in {1..12}; do \
+  curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/api/wallets; done
+```
+
+- Blacklist after signout:
+
+```bash
+TOKEN=$(curl -s -H 'Content-Type: application/json' \
+  -d '{"email":"wallet@test.com","password":"pass1"}' \
+  http://localhost:8080/api/auth/signin | jq -r .token)
+
+curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/auth/signout
+
+curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/wallets # expect 401
+```
+
+- Reset rate limit (per caller IP, optional email for signin limiter):
+
+```bash
+curl -i -H 'Content-Type: application/json' \
+  -d '{"email":"user@example.com"}' \
+  http://localhost:8080/api/auth/ratelimit/reset
+```
+
 ### Error responses
 
 Standardized error payloads are returned across the API. Each response includes a `requestId` to correlate with logs.
