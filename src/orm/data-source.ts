@@ -12,8 +12,6 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: false,
   entities: ['src/orm/entities/**/*.ts'],
-  migrations: ['src/orm/migrations/**/*.ts'],
+  migrations: ['src/orm/migrations/**/*.ts', 'src/orm/seeds/**/*.ts'],
   namingStrategy: new SnakeNamingStrategy()
 });
-
-export default AppDataSource;

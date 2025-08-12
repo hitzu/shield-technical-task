@@ -58,10 +58,14 @@ describe('wallets module', () => {
   test('CRUD wallets', async () => {
     const { default: app } = await import('../../app');
 
+    const address = `0x${Date.now().toString(16)}_${Math.random()
+      .toString(16)
+      .slice(2)}`;
+
     const created = await supertest(app)
       .post('/api/wallets')
       .set({ Authorization: token })
-      .send({ tag: 'primary', chain: 'ethereum', address: '0xabc123' });
+      .send({ tag: 'primary', chain: 'ethereum', address });
     expect(created.status).toBe(201);
     const id = created.body.id;
 
@@ -75,12 +79,12 @@ describe('wallets module', () => {
       .get(`/api/wallets/${id}`)
       .set({ Authorization: token });
     expect(detail.status).toBe(200);
-    expect(detail.body.address).toBe('0xabc123');
+    expect(detail.body.address).toBe(address);
 
     const updated = await supertest(app)
       .put(`/api/wallets/${id}`)
       .set({ Authorization: token })
-      .send({ tag: 'primary-2', chain: 'ethereum', address: '0xabc123' });
+      .send({ tag: 'primary-2', chain: 'ethereum', address });
     expect(updated.status).toBe(200);
 
     const removed = await supertest(app)

@@ -10,12 +10,12 @@
     "README.md"
   ],
   "scripts": {
-    "db:start": "docker compose up -d db_postgres",
+    "db:start": "docker compose up -d db_postgres && docker compose up -d redis",
     "dev": "npm run db:start && npm run start",
     "start": "nodemon index.ts",
     "types": "ttsc --emitDeclarationOnly",
     "build": "rm -rf lib && babel src --out-dir lib --extensions '.ts' && npm run types",
-    "test:db:up": "docker compose -f docker-compose.test.yml up -d db_postgres_test",
+    "test:db:up": "docker compose -f docker-compose.test.yml up -d db_postgres_test redis_test",
     "test:db:down": "docker compose -f docker-compose.test.yml down -v",
     "test:ci": "npm run test:db:up && jest && npm run test:db:down",
     "db:stop": "docker compose rm -s -f",
@@ -97,8 +97,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged && npm run test",
-      "pre-push": "npm run test"
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run test:ci"
     }
   },
   "lint-staged": {

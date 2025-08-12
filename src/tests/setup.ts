@@ -12,3 +12,19 @@ process.env.TOKEN_SECRET_KEY =
 process.env.JWT_EXPIRATION = process.env.JWT_EXPIRATION || '1h';
 process.env.NODE_ENV = 'test';
 process.env.REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6380';
+
+// Ensure Redis client is closed after tests to avoid open handles in Jest
+import { getRedisClient } from '../services/redis';
+
+afterAll(async () => {
+  try {
+    const client = getRedisClient();
+    // Prefer graceful quit to flush and close connection
+    await client.quit();
+  } catch (err) {
+    // Fallback: force disconnect if quit fails
+    try {
+      getRedisClient().disconnect();
+    } catch {}
+  }
+});
