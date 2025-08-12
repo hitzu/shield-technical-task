@@ -1,0 +1,16 @@
+services:
+  db_postgres_test:
+    image: 'postgres:14.2-alpine'
+    container_name: 'db_shield_test'
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test_db
+    ports:
+      - '5543:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d test_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+

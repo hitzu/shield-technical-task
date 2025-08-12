@@ -1,0 +1,8 @@
+services:
+  db_postgres:
+    container_name: 'db_shield'
+    ports:
+      - '5542:5432'
+    volumes:
+      - ./database/shield:/var/lib/postgresql/data/
+
