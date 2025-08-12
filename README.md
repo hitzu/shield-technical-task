@@ -70,6 +70,48 @@ npm run dev           # start DB and then start the API
 
 Visit Swagger at `http://localhost:8080/api-docs`.
 
+### Logging and request tracing (x-request-id)
+
+This service uses structured logging with Pino (`pino` + `pino-http`). Every HTTP request is logged as JSON and correlated with a `requestId`.
+
+- `x-request-id`:
+
+  - If the client sends an `x-request-id` header, the server reuses it.
+  - Otherwise, the server generates a UUID and returns it in the response `x-request-id` header.
+  - Use this value to trace a request end-to-end across services.
+
+- Log levels:
+
+  - Controlled by the `LOG_LEVEL` env var (`debug`, `info`, `warn`, `error`).
+  - Defaults: `debug` in development, `info` in production.
+
+- Example with curl:
+
+```bash
+curl -i \
+  -H 'x-request-id: demo-req-123' \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"wallet@test.com","password":"pass1"}' \
+  http://localhost:8080/api/auth/signin
+```
+
+- Example log line (truncated):
+
+```json
+{
+  "level": 30,
+  "time": 1700000000000,
+  "req": { "id": "demo-req-123", "method": "POST", "url": "/api/auth/signin" },
+  "res": { "statusCode": 200 },
+  "responseTime": 15,
+  "msg": "request completed"
+}
+```
+
+- Errors:
+  - When an error occurs, it is logged as `logger.error({ err, requestId }, 'request failed')`.
+  - Responses always include the `x-request-id` header so you can correlate them with logs.
+
 ### Database (tests)
 
 Run end-to-end tests (automatically brings test DB up and down):

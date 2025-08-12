@@ -9,12 +9,42 @@ import { swDocument } from './swagger.def';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import compression from 'compression';
+import pinoHttp from 'pino-http';
+import { randomUUID } from 'crypto';
+import { logger } from './src/services/logger';
 
 const app = Express();
 app.disable('x-powered-by');
 app.use(helmet());
 app.use(hpp());
 app.use(compression());
+app.use(
+  pinoHttp({
+    logger,
+    genReqId: req => (req.headers['x-request-id'] as string) || randomUUID(),
+    customProps: req => ({
+      requestId: (req.headers['x-request-id'] as string) || (req as any).id
+    }),
+    serializers: {
+      req(req) {
+        return { id: (req as any).id, method: req.method, url: req.url } as any;
+      },
+      res(res) {
+        return { statusCode: res.statusCode } as any;
+      }
+    },
+    autoLogging: {
+      ignore: req => req.url?.startsWith('/api-docs') === true
+    }
+  })
+);
+// Propagate x-request-id to all responses
+app.use((req, res, next) => {
+  const requestId =
+    (req as any).id || (req.headers['x-request-id'] as string) || randomUUID();
+  res.setHeader('x-request-id', String(requestId));
+  next();
+});
 app.use(Express.urlencoded({ extended: true }));
 app.use(Express.json({ limit: '50mb' }));
 app.use(corsHandler());

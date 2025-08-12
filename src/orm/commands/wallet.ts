@@ -16,7 +16,8 @@ export class walletCommands {
     try {
       const repo = getRepository(Wallet);
       const wallet = await repo.findOne({ where: { id, userId } });
-      if (!wallet) throw new GeneralError(new Error('Not found'), 'Not found', 404);
+      if (!wallet)
+        throw new GeneralError(new Error('Not found'), 'Not found', 404);
       return wallet;
     } catch (error) {
       if (error instanceof GeneralError) throw error;
@@ -56,13 +57,13 @@ export class walletCommands {
   static async deleteForUser(id: number, userId: number): Promise<void> {
     try {
       const repo = getRepository(Wallet);
-      const wallet = await this.findByIdForUser(id, userId);
-      await repo.remove(wallet);
+      // Ensure the wallet exists and belongs to user
+      await this.findByIdForUser(id, userId);
+      // Soft delete to set deleted_at instead of hard delete
+      await repo.softDelete({ id, userId });
     } catch (error) {
       if (error instanceof GeneralError) throw error;
       throw new GeneralError(error, 'Unable to delete wallet', 400);
     }
   }
 }
-
-

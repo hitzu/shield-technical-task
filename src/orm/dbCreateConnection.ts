@@ -1,17 +1,22 @@
 import { Connection, createConnection, getConnectionManager } from 'typeorm';
 
 import config from './config/ormconfig';
+import { logger } from '../services/logger';
 
 export const dbCreateConnection = async (): Promise<Connection | null> => {
   try {
     const conn = await createConnection(config);
-    console.log(
-      `Database connection success. Connection name: '${conn.name}' Database: '${conn.options.database}'`
+    logger.info(
+      { connection: conn.name, database: conn.options.database },
+      'database connected'
     );
     try {
       await conn.runMigrations();
     } catch (migrationError) {
-      console.log('Migration execution skipped or failed:', migrationError);
+      logger.warn(
+        { err: migrationError },
+        'migration execution skipped or failed'
+      );
     }
     return conn;
   } catch (err) {
@@ -19,7 +24,7 @@ export const dbCreateConnection = async (): Promise<Connection | null> => {
       const activeConnection = getConnectionManager().get(config.name);
       return activeConnection;
     }
-    console.log(err);
+    logger.error({ err }, 'database connection error');
   }
   return null;
 };

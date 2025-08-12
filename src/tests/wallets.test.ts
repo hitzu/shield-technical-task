@@ -36,9 +36,7 @@ describe('wallets module', () => {
     const res = await supertest(app)
       .post('/api/auth/signin')
       .send({ email: user.email, password: 'pass1' });
-    // Debug signin
-    // eslint-disable-next-line no-console
-    console.log('signin status:', res.status, 'body:', res.body);
+    // Debug logging removed; assertions will cover failures
     token = res.body.token;
   });
 
@@ -63,8 +61,6 @@ describe('wallets module', () => {
       .post('/api/wallets')
       .set({ Authorization: token })
       .send({ tag: 'primary', chain: 'ethereum', address: '0xabc123' });
-    // eslint-disable-next-line no-console
-    console.log('create wallet status:', created.status, 'body:', created.body);
     expect(created.status).toBe(201);
     const id = created.body.id;
 
