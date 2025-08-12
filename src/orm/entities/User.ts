@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import argon2 from 'argon2';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -46,13 +46,14 @@ export class User {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  hashPassword() {
-    this.password = bcrypt.hashSync(this.password, 8);
+  async hashPassword(): Promise<void> {
+    this.password = await argon2.hash(this.password, { type: argon2.argon2id });
   }
 
-  checkIfPasswordMatch(unencryptedPassword: string) {
-    return bcrypt.compareSync(unencryptedPassword, this.password);
+  async checkIfPasswordMatch(plain: string): Promise<boolean> {
+    if (this.password.startsWith('$argon2')) {
+      return argon2.verify(this.password, plain);
+    }
+    return argon2.verify(this.password, plain);
   }
-
-  // Reports relationship removed (legacy)
 }

@@ -1,9 +1,6 @@
-const JWT = require('jsonwebtoken');
-const CryptoJS = require('crypto-js');
-
-interface AnyObject {
-  [key: string]: any;
-}
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import CryptoJS from 'crypto-js';
+import { randomUUID } from 'crypto';
 
 export interface TokenData {
   user_id: string;
@@ -13,74 +10,50 @@ export interface TokenData {
   exp?: number;
 }
 
-const lowerCaseObjectKeys = (obj: any): AnyObject => {
-  const lower = {};
-
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      lower[key.toLowerCase()] = obj[key];
-    }
-  }
-
-  return lower;
-};
-
 export const generate = (
   user_id: number,
   username: string,
   status: string
 ): string => {
-  const jti = require('crypto').randomUUID();
-  const data = {
-    user_id: user_id as number,
-    username: username as string,
-    status: status as string,
-    jti
-  };
+  const jti = randomUUID();
+  const data = { user_id, username, status, jti };
   const encryptedData = CryptoJS.AES.encrypt(
     JSON.stringify(data),
-    process.env.TOKEN_SECRET
+    String(process.env.TOKEN_SECRET)
   );
 
-  return JWT.sign(
+  return jwt.sign(
     { encrypted: encryptedData.toString(), jti },
-    process.env.TOKEN_SECRET_KEY,
-    { expiresIn: process.env.JWT_EXPIRATION }
+    String(process.env.TOKEN_SECRET_KEY),
+    { expiresIn: String(process.env.JWT_EXPIRATION) }
   );
 };
 
-export const verify = (token: string): Promise<TokenData> => {
-  return new Promise<TokenData>((resolve, reject) => {
+export const verify = (token: string): Promise<TokenData> =>
+  new Promise<TokenData>((resolve, reject) => {
     try {
-      const tokenEncryptedData = JWT.verify(
+      const decoded = jwt.verify(
         token,
-        process.env.TOKEN_SECRET_KEY
-      );
-
+        String(process.env.TOKEN_SECRET_KEY)
+      ) as JwtPayload;
       const bytes = CryptoJS.AES.decrypt(
-        tokenEncryptedData.encrypted.toString(),
-        process.env.TOKEN_SECRET
+        String(decoded.encrypted),
+        String(process.env.TOKEN_SECRET)
       );
-
       const tokenData: TokenData = JSON.parse(
         bytes.toString(CryptoJS.enc.Utf8)
       );
-      tokenData.jti = tokenEncryptedData.jti;
-      tokenData.exp = tokenEncryptedData.exp;
+      tokenData.jti = decoded.jti as string | undefined;
+      tokenData.exp = decoded.exp as number | undefined;
       resolve(tokenData);
     } catch (error) {
       reject(error);
     }
   });
-};
 
-export const decode = (token: string): Promise<TokenData> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let verifiedToken: TokenData = await verify(token);
-      return resolve(verifiedToken);
-    } catch (error) {
-      return reject(error);
-    }
+export const decode = (token: string): Promise<TokenData> =>
+  new Promise((resolve, reject) => {
+    verify(token)
+      .then(resolve)
+      .catch(reject);
   });
-};
